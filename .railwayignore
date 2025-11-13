@@ -1,0 +1,12 @@
+.next
+node_modules
+src
+public
+*.md
+.git
+.gitignore
+tsconfig.json
+next.config.js
+tailwind.config.js
+postcss.config.mjs
+eslint.config.mjs

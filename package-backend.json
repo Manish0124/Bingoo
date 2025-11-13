@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "server-standalone.js",
   "scripts": {
-    "start": "node server-standalone.js"
+    "start": "node server-standalone.js",
+    "build": "echo 'No build needed'"
   },
   "dependencies": {
     "socket.io": "^4.8.1"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   }
 }

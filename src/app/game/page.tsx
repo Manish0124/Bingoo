@@ -42,9 +42,12 @@ function GameContent() {
     if (!roomId || !playerName) return;
 
     const socket = getSocket();
+    
+    console.log('Joining room:', roomId, 'as', playerName);
     socket.emit('join-room', { roomId, playerName, isHost });
 
     socket.on('room-update', ({ players, markedNumbers, gameStarted, currentTurn }) => {
+      console.log('Room update:', { players, gameStarted });
       setPlayers(players);
       setMarkedNumbers(markedNumbers || []);
       setGameStarted(gameStarted);
@@ -53,9 +56,12 @@ function GameContent() {
     });
 
     socket.on('game-auto-started', ({ players, currentTurn }) => {
+      console.log('Game auto-started! Players:', players);
       const myPlayer = players.find((p: any) => p.id === socket.id);
+      console.log('My player data:', myPlayer);
       if (myPlayer?.cardNumbers && Array.isArray(myPlayer.cardNumbers)) {
         const grid = arrayToGrid(myPlayer.cardNumbers);
+        console.log('Setting bingo card:', grid);
         setBingoCard(grid);
         const initialMarked = Array(5).fill(null).map(() => Array(5).fill(false));
         initialMarked[2][2] = true;
@@ -69,9 +75,13 @@ function GameContent() {
     });
 
     socket.on('game-started', ({ currentTurn, players }) => {
+      console.log('Game started! Players:', players);
       const myPlayer = players.find((p: any) => p.id === socket.id);
+      console.log('My player data:', myPlayer);
       if (myPlayer?.cardNumbers) {
-        setBingoCard(arrayToGrid(myPlayer.cardNumbers));
+        const grid = arrayToGrid(myPlayer.cardNumbers);
+        console.log('Setting bingo card:', grid);
+        setBingoCard(grid);
         const initialMarked = Array(5).fill(null).map(() => Array(5).fill(false));
         initialMarked[2][2] = true;
         setMarkedCells(initialMarked);

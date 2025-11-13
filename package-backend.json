@@ -1,0 +1,14 @@
+{
+  "name": "bingo-backend",
+  "version": "1.0.0",
+  "main": "server-standalone.js",
+  "scripts": {
+    "start": "node server-standalone.js"
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

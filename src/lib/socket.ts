@@ -4,11 +4,21 @@ let socket: Socket | null = null;
 
 export const getSocket = (): Socket => {
   if (!socket) {
-    socket = io({
-      transports: ['websocket', 'polling'],
+    const url = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001';
+    console.log('Connecting to socket server:', url);
+    socket = io(url, {
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
+    });
+    
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket?.id);
+    });
+    
+    socket.on('connect_error', (error) => {
+      console.error('Socket connection error:', error);
     });
   }
   return socket;

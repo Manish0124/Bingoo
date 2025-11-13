@@ -22,7 +22,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-md w-full">
-        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">🎯 Multiplayer Bingo</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">🎯 Multiplayer Bingo Game</h1>
         
         <div className="space-y-4 mb-6">
           <input

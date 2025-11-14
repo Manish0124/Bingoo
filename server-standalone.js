@@ -3,7 +3,15 @@ const { Server } = require('socket.io');
 
 const port = process.env.PORT || 3001;
 
-const httpServer = createServer();
+const httpServer = createServer((req, res) => {
+  if (req.url === '/health' || req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('OK');
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+});
 
 const io = new Server(httpServer, {
   cors: { 
@@ -258,6 +266,12 @@ io.on('connection', (socket) => {
   });
 });
 
+httpServer.on('error', (err) => {
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
 httpServer.listen(port, '0.0.0.0', () => {
   console.log(`Socket.io server running on port ${port}`);
+  console.log(`Health check available at http://0.0.0.0:${port}/health`);
 });

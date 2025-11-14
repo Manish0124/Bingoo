@@ -26,8 +26,8 @@ function Scoreboard({ players }: ScoreboardProps) {
             'bg-gray-50'
           }`}>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-lg">{idx + 1}.</span>
-              <span className="font-semibold">{player.name}</span>
+              <span className="font-bold text-blue-950 text-lg">{idx + 1}.</span>
+              <span className="font-semibold text-blue-950 ">{player.name}</span>
               {idx === 0 && <span>🥇</span>}
               {idx === 1 && <span>🥈</span>}
               {idx === 2 && <span>🥉</span>}

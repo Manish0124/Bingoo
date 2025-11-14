@@ -18,8 +18,17 @@ const httpServer = createServer((req, res) => {
   }
   
   if (req.url === '/health' || req.url === '/') {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('OK');
+    res.writeHead(200, { 
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
+    });
+    res.end(JSON.stringify({ 
+      status: 'ok', 
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+      rooms: rooms.size,
+      connections: io.engine.clientsCount
+    }));
   } else {
     res.writeHead(404);
     res.end();
@@ -298,9 +307,37 @@ httpServer.listen(port, '0.0.0.0', () => {
   console.log(`✅ Socket.io server running on port ${port}`);
   console.log(`✅ Health check available at http://0.0.0.0:${port}/health`);
   console.log(`✅ Server ready to accept connections`);
+  
+  setInterval(() => {
+    console.log(`💓 Heartbeat - Rooms: ${rooms.size}, Connections: ${io.engine.clientsCount}`);
+  }, 30000);
 }).on('error', (err) => {
   console.error('❌ Failed to start server:', err);
   if (err.code === 'EADDRINUSE') {
     console.error(`❌ Port ${port} is already in use`);
   }
 });
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, closing server gracefully');
+  httpServer.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, closing server gracefully');
+  httpServer.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled rejection at:', promise, 'reason:', reason);
+});}

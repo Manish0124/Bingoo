@@ -1,9 +1,10 @@
 const { createServer } = require('http');
 const { Server } = require('socket.io');
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 console.log('Starting server on port:', port);
 console.log('Environment:', process.env.NODE_ENV);
+console.log('Railway PORT env:', process.env.PORT);
 
 const httpServer = createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');

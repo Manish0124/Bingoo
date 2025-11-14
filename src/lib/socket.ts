@@ -5,8 +5,8 @@ let socket: Socket | null = null;
 export const getSocket = (): Socket => {
   if (!socket) {
     const url = typeof window !== 'undefined' 
-      ? (window as any).NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:3001'
-      : 'http://localhost:3001';
+      ? (window as any).NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_SOCKET_URL || 'https://bingoo-production.up.railway.app'
+      : 'https://bingoo-production.up.railway.app';
     console.log('Connecting to socket server:', url);
     socket = io(url, {
       transports: ['polling', 'websocket'],

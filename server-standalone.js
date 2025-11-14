@@ -2,6 +2,8 @@ const { createServer } = require('http');
 const { Server } = require('socket.io');
 
 const port = process.env.PORT || 3001;
+console.log('Starting server on port:', port);
+console.log('Environment:', process.env.NODE_ENV);
 
 const httpServer = createServer((req, res) => {
   if (req.url === '/health' || req.url === '/') {
@@ -278,6 +280,12 @@ httpServer.on('error', (err) => {
 });
 
 httpServer.listen(port, '0.0.0.0', () => {
-  console.log(`Socket.io server running on port ${port}`);
-  console.log(`Health check available at http://0.0.0.0:${port}/health`);
+  console.log(`✅ Socket.io server running on port ${port}`);
+  console.log(`✅ Health check available at http://0.0.0.0:${port}/health`);
+  console.log(`✅ Server ready to accept connections`);
+}).on('error', (err) => {
+  console.error('❌ Failed to start server:', err);
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${port} is already in use`);
+  }
 });

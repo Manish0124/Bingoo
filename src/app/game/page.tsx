@@ -37,6 +37,7 @@ function GameContent() {
   const [completedLines, setCompletedLines] = useState<string[]>([]);
   const [newLine, setNewLine] = useState<string | null>(null);
   const [showCheers, setShowCheers] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
 
   useEffect(() => {
     if (!roomId || !playerName) return;
@@ -45,6 +46,14 @@ function GameContent() {
     
     console.log('Joining room:', roomId, 'as', playerName);
     socket.emit('join-room', { roomId, playerName, isHost });
+
+    socket.on('connect', () => {
+      setSocketConnected(true);
+    });
+
+    socket.on('disconnect', () => {
+      setSocketConnected(false);
+    });
 
     socket.on('room-update', ({ players, markedNumbers, gameStarted, currentTurn }) => {
       console.log('Room update:', { players, gameStarted });
@@ -138,6 +147,8 @@ function GameContent() {
     });
 
     return () => {
+      socket.off('connect');
+      socket.off('disconnect');
       socket.off('room-update');
       socket.off('game-auto-started');
       socket.off('game-started');
@@ -257,6 +268,11 @@ function GameContent() {
     <div className={`min-h-screen bg-gradient-to-br ${currentTheme.bg} p-4 transition-all`}>
       <div className="max-w-7xl mx-auto">
         <div className="bg-white rounded-2xl shadow-2xl p-6 mb-4">
+          {!socketConnected && (
+            <div className="mb-4 p-4 bg-red-100 border-2 border-red-500 rounded-lg text-red-700 font-semibold">
+              ⚠️ Connecting to server... If this persists, the server may be down.
+            </div>
+          )}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold text-gray-800">Room: {roomId}</h1>

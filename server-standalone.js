@@ -28,18 +28,23 @@ const MIN_PLAYERS = 2;
 
 function generateSharedNumbers() {
   const ranges = [[1, 15], [16, 30], [31, 45], [46, 60], [61, 75]];
-  const sharedNumbers = [];
+  const allNumbers = [];
   
-  for (let col = 0; col < 5; col++) {
-    const [min, max] = ranges[col];
+  for (const [min, max] of ranges) {
     const available = Array.from({ length: max - min + 1 }, (_, i) => min + i);
-    for (let row = 0; row < 5; row++) {
-      if (col === 2 && row === 2) {
+    for (let i = 0; i < 5; i++) {
+      const idx = Math.floor(Math.random() * available.length);
+      allNumbers.push(available.splice(idx, 1)[0]);
+    }
+  }
+  
+  const sharedNumbers = [];
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < 5; col++) {
+      if (row === 2 && col === 2) {
         sharedNumbers.push(0);
       } else {
-        const idx = Math.floor(Math.random() * available.length);
-        sharedNumbers.push(available[idx]);
-        available.splice(idx, 1);
+        sharedNumbers.push(allNumbers[col * 5 + row]);
       }
     }
   }
@@ -76,7 +81,7 @@ function checkWin(marked) {
   if (marked.every((row, i) => row[i])) completedLines++;
   if (marked.every((row, i) => row[4 - i])) completedLines++;
   
-  return completedLines === 5;
+  return completedLines >= 5;
 }
 
 io.on('connection', (socket) => {
@@ -100,14 +105,17 @@ io.on('connection', (socket) => {
 
     const room = rooms.get(roomId);
     if (!room.players.find(p => p.id === socket.id)) {
-      const shuffledNumbers = room.sharedNumbers ? shuffleNumbers(room.sharedNumbers) : null;
+      // Generate the same card for all players
+      if (!room.sharedNumbers) {
+        room.sharedNumbers = generateSharedNumbers();
+      }
       room.players.push({ 
         id: socket.id, 
         name: playerName, 
         hasWon: false, 
         wins: 0, 
         score: 0,
-        cardNumbers: shuffledNumbers
+        cardNumbers: room.sharedNumbers
       });
     }
     
@@ -117,11 +125,10 @@ io.on('connection', (socket) => {
 
     if (!room.gameStarted && room.players.length >= MIN_PLAYERS) {
       room.gameStarted = true;
-      room.sharedNumbers = generateSharedNumbers();
       room.currentTurn = room.players[0].id;
       
       room.players.forEach(p => {
-        p.cardNumbers = shuffleNumbers(room.sharedNumbers);
+        p.cardNumbers = room.sharedNumbers;
       });
       
       setTimeout(() => {
@@ -144,11 +151,10 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomId);
     if (room && room.host === socket.id && !room.gameStarted) {
       room.gameStarted = true;
-      room.sharedNumbers = generateSharedNumbers();
       room.currentTurn = room.players[0]?.id || null;
       
       room.players.forEach(p => {
-        p.cardNumbers = shuffleNumbers(room.sharedNumbers);
+        p.cardNumbers = room.sharedNumbers;
       });
       
       io.to(roomId).emit('game-started', { 
@@ -209,7 +215,7 @@ io.on('connection', (socket) => {
       room.currentTurn = room.players[0]?.id || null;
       room.players.forEach(p => {
         p.hasWon = false;
-        p.cardNumbers = shuffleNumbers(room.sharedNumbers);
+        p.cardNumbers = room.sharedNumbers;
       });
       io.to(roomId).emit('game-reset', { 
         currentTurn: room.currentTurn,

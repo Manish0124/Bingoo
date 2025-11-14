@@ -11,7 +11,14 @@ interface BingoCardProps {
 
 function BingoCard({ card, markedCells, onCellClick, theme, markedNumbers = [], completedLines = [] }: BingoCardProps) {
   const headers = ['B', 'I', 'N', 'G', 'O'];
-  const markedSet = new Set(markedNumbers);
+  
+  if (!card || card.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-2xl p-6 text-center">
+        <p className="text-gray-600">Waiting for game to start...</p>
+      </div>
+    );
+  }
   
   const isInCompletedLine = (row: number, col: number) => {
     if (completedLines.includes(headers[col])) return true;
@@ -32,7 +39,7 @@ function BingoCard({ card, markedCells, onCellClick, theme, markedNumbers = [], 
         
         {card.map((row, rowIdx) =>
           row.map((num, colIdx) => {
-            const isMarked = markedCells[rowIdx][colIdx] || markedSet.has(num);
+            const isMarked = markedCells[rowIdx]?.[colIdx] || false;
             const inLine = isInCompletedLine(rowIdx, colIdx);
             return (
               <button

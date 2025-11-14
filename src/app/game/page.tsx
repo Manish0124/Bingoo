@@ -162,6 +162,25 @@ function GameContent() {
 
   const markedNumbersSet = useMemo(() => new Set(markedNumbers), [markedNumbers]);
 
+  useEffect(() => {
+    if (bingoCard.length === 0) return;
+    const newMarked = markedCells.map(r => [...r]);
+    for (let row = 0; row < 5; row++) {
+      for (let col = 0; col < 5; col++) {
+        if (markedNumbersSet.has(bingoCard[row][col])) {
+          newMarked[row][col] = true;
+        }
+      }
+    }
+    newMarked[2][2] = true;
+    setMarkedCells(newMarked);
+    
+    const lines = checkLines(newMarked);
+    if (lines.length !== completedLines.length) {
+      setCompletedLines(lines);
+    }
+  }, [markedNumbers, bingoCard]);
+
   const checkLines = useCallback((marked: boolean[][]) => {
     const lines: string[] = [];
     
@@ -190,7 +209,7 @@ function GameContent() {
   const toggleCell = useCallback((row: number, col: number) => {
     if (!gameStarted || !isMyTurn || !bingoCard[row]) return;
     const number = bingoCard[row][col];
-    if (number === undefined || number === 0 || markedNumbersSet.has(number)) return;
+    if (number === undefined || number === 0 || markedCells[row][col]) return;
     
     const newMarked = markedCells.map(r => [...r]);
     newMarked[row][col] = true;
@@ -207,7 +226,7 @@ function GameContent() {
       setTimeout(() => setNewLine(null), 2000);
       playSound('number-called');
       
-      if (lines.length === 5 && !winner) {
+      if (lines.length >= 5 && !winner) {
         setShowCheers(true);
         playSound('cheer');
         setTimeout(() => playSound('cheer'), 500);
@@ -223,40 +242,7 @@ function GameContent() {
     getSocket().emit('reset-game', roomId);
   }, [roomId]);
 
-  useEffect(() => {
-    if (markedNumbers.length > 0 && bingoCard.length > 0) {
-      const markedSet = new Set(markedNumbers);
-      const newMarked = bingoCard.map(row => 
-        row.map(num => num === 0 || markedSet.has(num))
-      );
-      
-      const lines: string[] = [];
-      const letters = ['B', 'I', 'N', 'G', 'O'];
-      
-      for (let i = 0; i < 5; i++) {
-        if (newMarked.every(row => row[i])) {
-          if (!lines.includes(letters[i])) lines.push(letters[i]);
-        }
-      }
-      
-      for (let i = 0; i < 5; i++) {
-        if (newMarked[i]?.every(cell => cell)) {
-          if (!lines.includes(`ROW${i}`)) lines.push(`ROW${i}`);
-        }
-      }
-      
-      if (newMarked.every((row, i) => row[i])) {
-        if (!lines.includes('DIAG1')) lines.push('DIAG1');
-      }
-      if (newMarked.every((row, i) => row[4 - i])) {
-        if (!lines.includes('DIAG2')) lines.push('DIAG2');
-      }
-      
-      if (lines.length <= 5) {
-        setCompletedLines(lines);
-      }
-    }
-  }, [markedNumbers, bingoCard]);
+
 
   const changeTheme = useCallback((newTheme: string) => {
     setTheme(newTheme);

@@ -13,7 +13,6 @@ export const getSocket = (): Socket => {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: 5,
-      withCredentials: true,
     });
     
     socket.on('connect', () => {

@@ -7,11 +7,11 @@ const httpServer = createServer();
 
 const io = new Server(httpServer, {
   cors: { 
-    origin: ['https://bingoo-alpha.vercel.app', 'http://localhost:3000', 'https://bingoo.vercel.app'],
-    methods: ['GET', 'POST'],
-    credentials: true
+    origin: '*',
+    methods: ['GET', 'POST']
   },
-  transports: ['websocket', 'polling'],
+  transports: ['polling', 'websocket'],
+  allowEIO3: true
 });
 
 const rooms = new Map();
@@ -258,6 +258,6 @@ io.on('connection', (socket) => {
   });
 });
 
-httpServer.listen(port, () => {
+httpServer.listen(port, '0.0.0.0', () => {
   console.log(`Socket.io server running on port ${port}`);
 });

@@ -6,7 +6,11 @@ const port = process.env.PORT || 3001;
 const httpServer = createServer();
 
 const io = new Server(httpServer, {
-  cors: { origin: '*' },
+  cors: { 
+    origin: ['https://bingoo-alpha.vercel.app', 'http://localhost:3000', 'https://bingoo.vercel.app'],
+    methods: ['GET', 'POST'],
+    credentials: true
+  },
   transports: ['websocket', 'polling'],
 });
 

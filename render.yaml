@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: bingo-socket
+    name: bingo-socket-server
     env: node
-    buildCommand: npm install socket.io
+    buildCommand: npm install
     startCommand: node server-standalone.js
     envVars:
-      - key: NODE_VERSION
-        value: 20.9.0
+      - key: NODE_ENV
+        value: production
